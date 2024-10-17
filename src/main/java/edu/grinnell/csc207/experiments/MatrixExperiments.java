@@ -59,7 +59,7 @@ public class MatrixExperiments {
 
     sample.insertCol(2);
     figure(pen, "insertCol(2)", sample);
-    
+
     try {
       sample.insertCol(6, new String[] {"A", "B", "C", "D", "E", "F"});
       figure(pen, "insertCol(6, ABCDEF)", sample);
@@ -88,7 +88,7 @@ public class MatrixExperiments {
 
     sample.fillLine(3, 0, 0, 1, 6, 6, "-");
     figure(pen, "fillLine(3, 0, 0, 1, 6, 6, \"-\")", sample);
-    
+
     sample.fillLine(1, 4, 1, 0, 5, 6, "?");
     figure(pen, "fillLine(1, 4, 1, 0, 5, 6, \"?\")", sample);
 
