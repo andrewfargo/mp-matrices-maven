@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * An implementation of two-dimensional matrices.
  *
- * @author Andrew Fargo
+ * @author Andrew N. Fargo
  * @author Samuel A. Rebelsky
  *
  * @param <T>
@@ -16,18 +16,28 @@ public class MatrixV0<T> implements Matrix<T> {
   // | Fields |
   // +--------+
 
+  /** The array itself. The lengths are (after operations) exactly
+      the dimensions of the array representation. */
   T[][] values;
+
+  /** Default value for array insertions. Notably a reference. */
   private T defaultValue;
-  private int cols; // in case height is 0; otherwise redundant
+
+  /** Used as an alias for this.values[0].length;
+      absolutely necessary since matrix may have 0
+      rows validly, where inserting a row should
+      create a row of size `cols`. */
+  private int cols;
 
   // +-----------------+---------------------------------------------
   // | Private Methods |
   // +-----------------+
-  
+
   /**
    * Repeats an element of type T into a new array.
    * @param val The value to repeat.
    * @param len The length of the generated array.
+   * @return [val, val, val, ... val] (len times)
    */
   @SuppressWarnings({"unchecked"})
   private T[] repeat(T val, int len) {
@@ -36,8 +46,16 @@ public class MatrixV0<T> implements Matrix<T> {
       ret[i] = val;
     } // for
     return ret;
-  }
+  } // repeat(T, int)
 
+  /**
+   * Shifts each row in the matrix by `amount` spaces.
+   *
+   * @param row The starting row. Goes until the end.
+   * @param amount The number of rows we shift by, negative
+   *   is valid and goes in the opposite direction.
+   * @pre row + amount is in bounds of this.values.
+   */
   private void shiftRows(int row, int amount) {
     T[][] newArr = Arrays.copyOf(this.values, this.values.length);
     for (int r = 0; r < this.height(); r++) {
@@ -47,24 +65,38 @@ public class MatrixV0<T> implements Matrix<T> {
     int endRow = Math.min(this.height(), this.height() - amount);
     for (int i = startRow; i < endRow; i++) {
       for (int col = 0; col < this.width(); col++) {
-	newArr[i + amount][col] = this.values[i][col];
+        newArr[i + amount][col] = this.values[i][col];
       } // for
     } // for
     this.values = newArr;
   } // shiftRow(int, int)
 
+  /**
+   * Shifts each column in the matrix by `amount` spaces.
+   *
+   * @param col The starting col. Goes until the end.
+   * @param amount The number of cols we shift by, negative
+   *   is valid and goes in the opposite direction.
+   * @pre col + amount is in bounds of this.values[i] for all valid i.
+   */
   private void shiftCols(int col, int amount) {
     int startCol = Math.max(col, col - amount);
     int endCol = Math.min(this.width(), this.width() - amount);
     for (int row = 0; row < this.height(); row++) {
       T[] newArr = Arrays.copyOf(this.values[row], this.cols);
       for (int i = startCol; i < endCol; i++) {
-	newArr[i + amount] = this.values[row][i];
+        newArr[i + amount] = this.values[row][i];
       } // for
       this.values[row] = newArr;
     } // for
   } // shiftCol(int, int)
 
+  /**
+   * Checks if the cell (row, col) is within bounds of the matrix.
+   * @param row The row of the cell.
+   * @param col The col of the cell.
+   * @return true if this.values[row][col] will throw a bounds exception.
+   */
   private boolean outOfBounds(int row, int col) {
     return row < 0 || row >= this.height() || col < 0 || col >= this.width();
   } // inBounds(int, int)
@@ -225,7 +257,7 @@ public class MatrixV0<T> implements Matrix<T> {
     // Reallocate
     this.values = Arrays.copyOf(this.values, this.values.length + 1);
     this.values[this.values.length - 1] = this.repeat(null, this.cols);
-    
+
     // Shift
     this.shiftRows(row, 1);
 
@@ -280,12 +312,12 @@ public class MatrixV0<T> implements Matrix<T> {
 
     // Shift
     this.shiftCols(col, 1);
-    
+
     // Place
     for (int i = 0; i < vals.length; i++) {
       this.values[i][col] = vals[i];
     } // for
-    
+
   } // insertCol(int, T[])
 
   /**
@@ -307,7 +339,7 @@ public class MatrixV0<T> implements Matrix<T> {
 
     // Reallocate
     this.values = Arrays.copyOf(this.values, this.values.length - 1);
-    
+
   } // deleteRow(int)
 
   /**
@@ -330,7 +362,7 @@ public class MatrixV0<T> implements Matrix<T> {
     // Reallocate
     for (int row = 0; row < this.height(); row++) {
       this.values[row] = Arrays.copyOf(this.values[row],
-				       this.values[row].length - 1);
+                                       this.values[row].length - 1);
     } // for
 
     this.cols--;
@@ -360,7 +392,7 @@ public class MatrixV0<T> implements Matrix<T> {
     } // if
     for (int row = startRow; row < endRow; row++) {
       for (int col = startCol; col < endCol; col++) {
-	this.set(row, col, val);
+        this.set(row, col, val);
       } // for col
     } // for row
   } // fillRegion(int, int, int, int, T)
@@ -391,10 +423,10 @@ public class MatrixV0<T> implements Matrix<T> {
     if (outOfBounds(startRow, startCol) || outOfBounds(endRow - 1, endCol - 1)) {
       throw new IndexOutOfBoundsException();
     } // if
-    
+
     for (int row = startRow, col = startCol;
-	 row < endRow && col < endCol;
-	 row += deltaRow, col += deltaCol) {
+         row < endRow && col < endCol;
+         row += deltaRow, col += deltaCol) {
       this.set(row, col, val);
     } // for row
   } // fillLine(int, int, int, int, int, int, T)
@@ -408,11 +440,11 @@ public class MatrixV0<T> implements Matrix<T> {
    */
   public Matrix<T> clone() {
     MatrixV0<T> newMatrix = new MatrixV0<T>(this.width(),
-					    this.height(), this.defaultValue);
+                                            this.height(), this.defaultValue);
     for (int row = 0; row < this.height(); row++) {
       for (int col = 0; col < this.height(); col++) {
-	newMatrix.set(row, col, this.get(row, col));
-      }
+        newMatrix.set(row, col, this.get(row, col));
+      } // for
     } // for
     return newMatrix;
   } // clone()
@@ -430,18 +462,18 @@ public class MatrixV0<T> implements Matrix<T> {
   public boolean equals(Object other) {
     // Whoa, generics are fun
     return (other instanceof Matrix)
-	    && this.equals((Matrix<T>) other);
+            && this.equals((Matrix<T>) other);
   } // equals(Object)
 
-  public boolean equals(Matrix<T> other) {
+  private boolean equals(Matrix<T> other) {
     if (other.width() != this.width() || other.height() != this.height()) {
       return false;
     } // if
     for (int row = 0; row < this.height(); row++) {
       for (int col = 0; col < this.width(); col++) {
-	if (!this.get(row, col).equals(other.get(row, col))) {
-	  return false;
-	} // if
+        if (!this.get(row, col).equals(other.get(row, col))) {
+          return false;
+        } // if
       } // for col
     } // for row
     return true;
