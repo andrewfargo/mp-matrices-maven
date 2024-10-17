@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * An implementation of two-dimensional matrices.
  *
- * @author Your Name Here
+ * @author Andrew Fargo
  * @author Samuel A. Rebelsky
  *
  * @param <T>
@@ -35,13 +35,13 @@ public class MatrixV0<T> implements Matrix<T> {
    *   The second dimension coordinate of the matrix. (Col)
    * @return The flattened index into the internal array.
    *
-   * @pre 0 <= i < this.height
-   * @pre 0 <= j < this.width
+   * @pre 0 <= row < this.height
+   * @pre 0 <= col < this.width
    *
    * @post Return is a valid position in internal representation.
    */
-  private int getIndex(int i, int j) {
-    return i + j * this.width;
+  private int getIndex(int row, int col) {
+    return col + row * this.width;
   } // getIndex(int, int)
 
   /**
@@ -138,10 +138,12 @@ public class MatrixV0<T> implements Matrix<T> {
     if (width < 0 || height < 0) {
       throw new NegativeArraySizeException();
     } // if
-    // Ensure that arrays of size 0 and 1 can expand if doubled.
+
     this.width = width;
     this.height = height;
     this.defaultValue = def;
+
+    // Ensure that arrays of size 0 and 1 can expand if doubled.
     this.values = (T[]) new Object[2];
     this.expand(height - 1, width - 1);
 
@@ -182,7 +184,7 @@ public class MatrixV0<T> implements Matrix<T> {
    *   If either the row or column is out of reasonable bounds.
    */
   public T get(int row, int col) {
-    if (this.getIndex(row, col) >= this.values.length) {
+    if (this.getIndex(row, col) >= this.width * this.height) {
       throw new IndexOutOfBoundsException();
     } // if
     return this.values[this.getIndex(row, col)];
@@ -202,7 +204,7 @@ public class MatrixV0<T> implements Matrix<T> {
    *   If either the row or column is out of reasonable bounds.
    */
   public void set(int row, int col, T val) {
-    if (this.getIndex(row, col) >= this.values.length) {
+    if (this.getIndex(row, col) >= this.width * this.height) {
       throw new IndexOutOfBoundsException();
     } // if
     this.values[this.getIndex(row, col)] = val;
