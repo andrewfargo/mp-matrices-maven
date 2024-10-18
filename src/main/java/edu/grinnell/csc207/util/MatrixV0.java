@@ -389,7 +389,7 @@ public class MatrixV0<T> implements Matrix<T> {
       T val) {
     if (endRow - startRow == 0 || endCol - startCol == 0) {
       return;
-    } if (outOfBounds(startRow, startCol) || outOfBounds(endRow - 1, endCol - 1)) {
+    } else if (outOfBounds(startRow, startCol) || outOfBounds(endRow - 1, endCol - 1)) {
       throw new IndexOutOfBoundsException();
     } // if/else
 
