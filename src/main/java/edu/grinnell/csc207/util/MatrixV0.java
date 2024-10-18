@@ -387,11 +387,9 @@ public class MatrixV0<T> implements Matrix<T> {
    */
   public void fillRegion(int startRow, int startCol, int endRow, int endCol,
       T val) {
-    if (outOfBounds(startRow, startCol)) {
-      throw new IndexOutOfBoundsException();
-    } else if (endRow - startRow == 0 || endCol - startCol == 0) {
+    if (endRow - startRow == 0 || endCol - startCol == 0) {
       return;
-    } else if (outOfBounds(endRow - 1, endCol - 1)) {
+    } if (outOfBounds(startRow, startCol) || outOfBounds(endRow - 1, endCol - 1)) {
       throw new IndexOutOfBoundsException();
     } // if/else
 
